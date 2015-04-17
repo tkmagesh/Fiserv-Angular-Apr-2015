@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Salary Calculator</title>
+    <style>
+        label{
+            display: block;
+        }
+        #divResult{
+            font-size: 26pt;
+            font-weight: bold;
+            color : red;
+        }
+    </style>
+    <script src="jquery-1.11.2.js"></script>
+    <script src="angular.js"></script>
+    <script>
+    String.prototype.toInt = function(){
+        return parseInt(this,10);
+    }
+    function SalaryCalculator(){
+        this.basic = "";
+        this.hra = "";
+        this.da = "";
+        this.tax = "";
+        this.salary = "";
+    }
+    SalaryCalculator.prototype.calculate = function(){
+        var gross = parseInt(this.basic,10) + parseInt(this.hra,10) + parseInt(this.da,10);
+        this.salary = gross * ((100-parseInt(this.tax,10))/100);
+    }
+
+
+        angular.module('myApp', []).run(function($rootScope){
+            $rootScope.calculator = new SalaryCalculator();
+        })
+
+
+    </script>
+</head>
+<body ng-app="myApp">
+    <h1>Salary Calculator</h1>
+    <div class="content">
+        <div class="field">
+        <label for="">Basic :</label>
+        <input type="text" name="" id="txtBasic" ng-model="calculator.basic">
+    </div>
+        <div class="field"><label for="">HRA :</label><input type="text" name="" id="txtHra" ng-model="calculator.hra"></div>
+        <div class="field"><label for="">DA :</label><input type="text" name="" id="txtDa" ng-model="calculator.da"></div>
+        <div class="field">
+            <label for="">Tax %:</label>
+            <input type="range" name="" id="rangeTax" min="0" max="30" value="0" ng-model="calculator.tax">
+            <span id="spanTax" ng-bind="calculator.tax">[Tax]</span>
+        </div>
+        <div class="field"><input type="button" value="Calculate" id="btnCalculate" ng-click="calculator.calculate()"></div>
+        <div class="field">
+            <div id="divResult" ng-bind='calculator.salary'>[Salary]</div>
+        </div>
+    </div>
+</body>
+</html>
