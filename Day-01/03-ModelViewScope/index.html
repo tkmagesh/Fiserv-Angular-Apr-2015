@@ -52,31 +52,31 @@
 
 
             scope.$watch(model, function watch(){
-                $elem.val(eval('scope.' + model));
+                $elem.val(scope.$eval(model));
             });
             $elem.change(function change(){
                 var value = this.value;
                 scope.$apply(function changeApply(){
-                    var expr = 'scope.' + model + ' = ' + value;
-                    eval(expr);
+                    var expr = model + ' = ' + value;
+                    scope.$eval(expr);
                 });
             });
         });
 
         $(":button").click(function(){
            var $this = $(this);
-           var expr ='scope.' +  $this.attr("appClick");
+           var expr =  $this.attr("appClick");
             scope.$apply(function buttonClick(){
-                eval(expr);
+                scope.$eval(expr);
             });
         });
 
         $("*[bind]").each(function bind(){
             var $this = $(this);
             var model = $this.attr("bind");
-            var expr = 'scope.' + model;
+            var expr =  model;
             scope.$watch(model, function(){
-                $this.html(eval(expr));
+                $this.html(scope.$eval(expr));
             });
         });
 
