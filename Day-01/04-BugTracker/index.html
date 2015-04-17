@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Bug Tracker</title>
+    <style>
+    li{
+        cursor: pointer;
+    }
+        .closed {
+            color : red;
+            text-decoration: line-through;
+            font-style : italic;
+            font-weight: bold;
+        }
+    </style>
     <script src="angular.js"></script>
     <!--
     1. List the bugs
@@ -16,18 +27,54 @@
 
     -->
     <script>
-
-
+        var bugTrackerApp = angular.module('bugTrackerApp',[]);
+        
+        bugTrackerApp.controller("bugsController", function($scope){
+            $scope.bugs = [
+                {title : "Unable to login", isClosed : false},
+                {title : "Data not saved", isClosed : false},
+                {title : "Bugs not added", isClosed : false},
+            ];
+            $scope.addNew = function(){
+                var newBug = {
+                    title : $scope.newBug,
+                    isClosed : false
+                };
+                $scope.bugs.push(newBug);
+            };
+            $scope.toggleStatus = function(bug){
+                bug.isClosed = !bug.isClosed;
+            };
+            $scope.getClosedCount = function(){
+                return $scope.bugs.filter(function(bug){
+                    return bug.isClosed;
+                }).length;
+            }
+        });
     </script>
 </head>
-<body>
+<body ng-app="bugTrackerApp">
     <h1>Bug Tracker</h1>
-    <div class="content">
+    <div class="content" ng-controller="bugsController">
+       <hr>
+        <div>{{getClosedCount()}} / {{bugs.length}}</div>
+        <hr>
+        <div>
+            <label>Search :</label>
+            <input type="text" ng-model='searchBug.title'>
+        </div>
+        <hr>
         <label for="">Bug :</label>
-        <input type="text" name="" id="">
-        <input type="button" value="Add Bug">
+        <input type="text" name="" id="" ng-model="newBug">
+        <input type="button" value="Add Bug" ng-click="addNew()">
         <input type="button" value="Remove Closed">
-        <ol></ol>
+        <ol>
+            <li 
+                ng-repeat = "bug in bugs |filter:searchBug" 
+                ng-click="toggleStatus(bug)"
+                ng-class="{closed : bug.isClosed}"
+            >{{bug.title | lowercase}}</li>
+        </ol>
     </div>
 </body>
 </html>
