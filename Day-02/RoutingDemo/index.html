@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Routing Demo</title>
+    <script src="angular.js"></script>
+    <script src="angular-route.js"></script>
+    <script>
+        angular
+            .module('myApp',['ngRoute'])
+            .config(function($routeProvider){
+                $routeProvider
+                    .when('/products',{
+                        templateUrl : 'templates/productsTemplate.html',
+                        controller : 'productsController'
+                    })
+                  .when('/customers',{
+                        templateUrl : 'templates/customersTemplate.html'
+                    })
+                .when('/products/:productId',{
+                        templateUrl : 'templates/productInfoTemplate.html',
+                        controller : 'productInfoController'
+                })
+                  .otherwise('/products');
+            })
+            .controller('productsController', function($http, $scope){
+                $http.get('products.json').then(function(response){
+                    $scope.products = response.data;
+                });
+            })
+            .controller('productInfoController', function($http, $routeParams, $scope){
+                var url = 'product-' + $routeParams.productId + ".json";
+                $http.get(url).then(function(response){
+                    console.log(response);
+                    $scope.product = response.data;
+                });
+            });
+    </script>
+</head>
+<body ng-app='myApp'>
+    <h1>My App</h1>
+    <a href="#/products">Products</a>  <a href="#/customers">Customers</a>
+    <hr>
+    <ng-view></ng-view>
+</body>
+</html>
