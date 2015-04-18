@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Custom Directives</title>
+    <script src="angular.js"></script>
+    <script>
+        angular
+            .module("myApp", [])
+            .directive("hideOnClick", function(){
+                return {
+                    scope : {
+                        rmessage : '=',
+                        afterclick : '&'
+                    },
+                    link : function(scope, element, attributes){
+                        element.bind("click", function(){
+                        //element.css("display", "none");
+
+                            element.html(scope.rmessage);
+                            scope.$apply(function(){
+                                scope.afterclick();
+                            });
+                        /*scope.$apply(function(){
+                            scope.replacementMessage = 'something else';
+                        });*/
+                        });
+                    }
+                };
+                /*return function(scope, element, attributes){
+                    console.dir(element);
+                    element.bind("click", function(){
+                        //element.css("display", "none");
+                        element.html(scope.replacementMessage);
+                        scope.$apply(function(){
+                            scope.replacementMessage = 'something else';
+                        });
+                    });
+                }*/
+            })
+            .run(function($rootScope){
+
+                    $rootScope.replacementMessage = "This is a replacement message";
+            })
+            .controller("testController", function($scope){
+                $scope.replacementMessage = 'this is something';
+                $scope.clicked = function(){
+                    console.log('clicked triggered');
+                    $scope.replacementMessage = 'the directive has been clicked';
+                }
+            });
+    </script>
+</head>
+<body ng-app="myApp">
+    <div ng-controller='testController'>
+        <input type="text" ng-model='something'>
+        <div>{{replacementMessage}}</div>
+         <div hide-on-click rmessage='replacementMessage' afterclick='clicked()'>This text will disapper on click</div>
+        </div>
+
+</body>
+</html>

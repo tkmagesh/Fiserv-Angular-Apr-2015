@@ -69,8 +69,8 @@
                  setStorage : function(storageOption){
                      _storageOption = storageOption;
                  },
-                 $get : function(Bug){
-                     storage = _storageOption === "localStorage" ? window.localStorage : window.sessionStorage;
+                 $get : function(Bug, $window){
+                     var storage = _storageOption === "localStorage" ? $window.localStorage : $window.sessionStorage;
                      return {
                          getAll : function(){
                             var result = [];
@@ -97,12 +97,6 @@
         bugTrackerApp.config(function(bugStorageProvider){
             bugStorageProvider.setStorage('localStorage');
         });
-
-
-
-
-
-
 
         /*bugTrackerApp.value('Bug', (function(){
             function Bug(defaults){
