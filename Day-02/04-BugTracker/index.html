@@ -34,20 +34,36 @@
 
     -->
     <script>
-        var bugTrackerApp = angular.module('bugTrackerApp',[]);
-
-        bugTrackerApp.filter('trimText', function(){
+        var utils = angular.module('utils',[]);
+        utils.filter('trimText', function(){
             return function(data, textLength){
                 return data.length > textLength ? data.substr(0,textLength) + "..." : data;
             }
         });
-        bugTrackerApp.value('momentApi', moment);
+        utils.value('momentApi', moment);
 
-        bugTrackerApp.filter('toMoment', function(momentApi){
+        utils.filter('toMoment', function(momentApi){
             return function(data){
                 return momentApi(data).fromNow();
             }
         });
+
+        var bugTrackerApp = angular.module('bugTrackerApp',['utils']);
+
+
+
+        /*bugTrackerApp.value('Bug', (function(){
+            function Bug(defaults){
+                this.id = defaults.id || Date.now();
+                this.title = defaults.title || "";
+                this.isClosed = defaults.isClosed || false;
+                this.createdAt = defaults.createdAt || new Date();
+            }
+            Bug.prototype.toggleStatus = function(){
+                this.isClosed = !this.isClosed;
+            }
+            return Bug;
+        })());*/
 
          bugTrackerApp.factory('Bug', function(){
             function Bug(defaults){
