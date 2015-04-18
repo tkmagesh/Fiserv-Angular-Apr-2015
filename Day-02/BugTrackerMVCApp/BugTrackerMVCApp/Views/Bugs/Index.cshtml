@@ -1,4 +1,4 @@
-@model dynamic
+﻿@model dynamic
 
 @{
     Layout = null;
@@ -119,12 +119,32 @@
             };
         });
 
-        bugTrackerApp.controller("bugsController", function($scope, Bug, bugStorage, $http){
+        bugTrackerApp.service("bugService", function ($http, Bug, $q) {
+            var defered = $q.defer();
+
+            this.getAll = function() {
+                var promise = $http.get('/api/bugsdata');
+                promise.then(function(response) {
+                    var result = response.data.map(function(data) {
+                        return new Bug(data);
+                    });
+                    defered.resolve(result);
+                });
+               
+                return defered.promise;
+            };
+        });
+
+        bugTrackerApp.controller("bugsController", function($scope, Bug, bugStorage, bugService){
             //$scope.bugs = bugStorage.getAll();
             $scope.bugs = [];
-            $http.get('/api/bugsdata').then(function(response) {
-                $scope.bugs = response.data;
+            var promise = bugService.getAll();
+            $scope.canAdd = false;
+            promise.then(function(bugs) {
+                $scope.bugs = bugs;
+                $scope.canAdd = true;
             });
+
             $scope.addNew = function(){
                 var newBug = new Bug({
                     title : $scope.newBug,
@@ -170,8 +190,8 @@
         </div>
         <hr>
         <label for="">Bug :</label>
-        <input type="text" name="" id="" ng-model="newBug">
-        <input type="button" value="Add Bug" ng-click="addNew()">
+        <input type="text" name="" id="" ng-model="newBug" >
+        <input type="button" value="Add Bug" ng-click="addNew()" ng-disabled="!canAdd">
         <input type="button" value="Remove Closed" ng-click="removeCompleted()">
         <ol>
             <li ng-repeat = "bug in bugs |filter:searchBug">

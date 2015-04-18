@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using BugTrackerMVCApp.Models;
+using System.Threading;
 
 namespace BugTrackerMVCApp.Controllers
 {
@@ -19,6 +20,8 @@ namespace BugTrackerMVCApp.Controllers
         // GET api/bugsdata
         public IEnumerable<Bug> Get()
         {
+            Thread.Sleep(4000);
+            
             return BugRepository;
         }
 
