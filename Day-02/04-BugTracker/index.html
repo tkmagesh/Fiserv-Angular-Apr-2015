@@ -32,6 +32,19 @@
     6. persist bugs in local storage
     7. persist bugs in server
 
+
+    window.localStorage
+        key/value store
+        key has to be unique
+        both key and value should be strings
+
+        - setItem(key,value)
+        - getItem(key) => value
+        - removeItem(key)
+        - clear()
+        - key(index) => key
+        - length
+
     -->
     <script>
         var utils = angular.module('utils',[]);
@@ -67,7 +80,7 @@
 
          bugTrackerApp.factory('Bug', function(){
             function Bug(defaults){
-                this.id = defaults.id || Date.now();
+                this.id = defaults.id || Date.now().toString();
                 this.title = defaults.title || "";
                 this.isClosed = defaults.isClosed || false;
                 this.createdAt = defaults.createdAt || new Date();
@@ -77,23 +90,49 @@
             }
             return Bug;
         });
+        bugTrackerApp.service('bugStorage' function(Bug){
+            this.getAll = function(){
+                var result = [];
+                for(var i=0; i < storage.length; i++){
+                    var key = storage.key(i);
+                    var dataAsString = storage.getItem(key);
+                    var bugData = angular.fromJson(dataAsString);
+                    var bug = new Bug(bugData);
+                    result.push(bug);
+                }
+                return result;
+            };
+            this.save = function(bug){
+                storage.setItem(bug.id, angular.toJson(bug));
+            };
+            this.remove = function(bug){
+                storage.removeItem(bug.id);
+            };
+        })
 
-        bugTrackerApp.controller("bugsController", function($scope, Bug){
-            $scope.bugs = [
-                new Bug({title : "Ut magna commodo, cupidatat labore eiusmod. Quamquam ad duis nam ut excepteur sempiternum hic minim do an quorum ingeniis se qui", isClosed : false, createdAt : new Date("18-Apr-2015 9:00:00")}),
-                new Bug({title : "arbitror sed nescius. Sunt laboris quo laboris, mentitum amet fabulas, ab ut", isClosed : false, createdAt : new Date("18-Apr-2015 10:00:00")}),
-                new Bug({title : "ipsum quid quae, de noster vidisse. Illum vidisse est fidelissimae ab ad summ", isClosed : false, createdAt : new Date("18-Apr-2015 11:00:00")}),
-            ];
+        bugTrackerApp.controller("bugsController", function($scope, Bug, bugStorage){
+            $scope.bugs = bugStorage.getAll();
             $scope.addNew = function(){
-                var newBug = {
+                var newBug = new Bug({
                     title : $scope.newBug,
                     isClosed : false
-                };
-                $scope.bugs.push(new Bug(newBug));
+                });
+                bugStorage.save(newBug);
+                $scope.bugs.push(newBug);
             };
             $scope.toggleStatus = function(bug){
                 bug.toggleStatus();
+                bugStorage.save(bug);
             };
+            $scope.removeCompleted = function(){
+                for(var i= $scope.bugs.length -1; i>=0; i--){
+                    var bug = $scope.bugs[i];
+                    if (bug.isClosed){
+                        bugStorage.remove(bug);
+                        $scope.bugs.splice(i,1);
+                    }
+                }
+            }
             $scope.getClosedCount = function(){
                 return $scope.bugs.filter(function(bug){
                     return bug.isClosed;
@@ -118,7 +157,7 @@
         <label for="">Bug :</label>
         <input type="text" name="" id="" ng-model="newBug">
         <input type="button" value="Add Bug" ng-click="addNew()">
-        <input type="button" value="Remove Closed">
+        <input type="button" value="Remove Closed" ng-click="removeCompleted()">
         <ol>
             <li ng-repeat = "bug in bugs |filter:searchBug">
             <span ng-click="toggleStatus(bug)"
