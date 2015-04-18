@@ -1,0 +1,10 @@
+4. Refactoring : By Martin Fowler
+Refactoring To Patterns : Joshua Keriewsky
+1. Agile Principles Patterns and Practices - Robert. C. Martin
+Domain-Driven Design - Eric Evans
+Applying Domain-Driven Design and patterns in .NET - Jimmy Nillson
+2. Head First OOAD
+3. Head First Design Patterns
+Patterns of Enterprise Application Architecture - Martin Fowler
+Working with Legacy Code - Michael Feathers
+

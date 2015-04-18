@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bug Tracker</title>
+    <style>
+    li{
+        cursor: pointer;
+    }
+        .closed {
+            color : red;
+            text-decoration: line-through;
+            font-style : italic;
+            font-weight: bold;
+        }
+    </style>
+    <script src="angular.js"></script>
+    <!--
+    1. List the bugs
+    2. Add a new bug
+    3. toggle closed for each bug
+    4. remove closed bugs
+    5. display stats
+    6. display bug creation time
+    6. persist bugs in local storage
+    7. persist bugs in server
+
+    -->
+    <script>
+        var bugTrackerApp = angular.module('bugTrackerApp',[]);
+
+        bugTrackerApp.filter('trimText', function(){
+            return function(data){
+                return data.length > 30 ? data.substr(0,30) + "..." : data;
+            }
+        });
+
+         bugTrackerApp.factory('Bug', function(){
+            function Bug(defaults){
+                this.id = defaults.id || Date.now();
+                this.title = defaults.title || "";
+                this.isClosed = defaults.isClosed || false;
+                this.createAt = defaults.createdAt || new Date();
+            }
+            Bug.prototype.toggleStatus = function(){
+                this.isClosed = !this.isClosed;
+            }
+            return Bug;
+        });
+
+        bugTrackerApp.controller("bugsController", function($scope, Bug){
+            $scope.bugs = [
+                new Bug({title : "Ut magna commodo, cupidatat labore eiusmod. Quamquam ad duis nam ut excepteur sempiternum hic minim do an quorum ingeniis se qui", isClosed : false}),
+                new Bug({title : "arbitror sed nescius. Sunt laboris quo laboris, mentitum amet fabulas, ab ut", isClosed : false}),
+                new Bug({title : "ipsum quid quae, de noster vidisse. Illum vidisse est fidelissimae ab ad summ", isClosed : false}),
+            ];
+            $scope.addNew = function(){
+                var newBug = {
+                    title : $scope.newBug,
+                    isClosed : false
+                };
+                $scope.bugs.push(new Bug(newBug));
+            };
+            $scope.toggleStatus = function(bug){
+                bug.toggleStatus();
+            };
+            $scope.getClosedCount = function(){
+                return $scope.bugs.filter(function(bug){
+                    return bug.isClosed;
+                }).length;
+            }
+        });
+    </script>
+</head>
+<body ng-app="bugTrackerApp">
+    <h1>Bug Tracker</h1>
+    <div class="content" ng-controller="bugsController">
+       <hr>
+        <div>{{getClosedCount()}} / {{bugs.length}}</div>
+        <hr>
+        <div>
+            <label>Search :</label>
+            <input type="text" ng-model='searchBug.title'>
+        </div>
+        <hr>
+        <label for="">Bug :</label>
+        <input type="text" name="" id="" ng-model="newBug">
+        <input type="button" value="Add Bug" ng-click="addNew()">
+        <input type="button" value="Remove Closed">
+        <ol>
+            <li
+                ng-repeat = "bug in bugs |filter:searchBug"
+                ng-click="toggleStatus(bug)"
+                ng-class="{closed : bug.isClosed}"
+            >{{bug.title | trimText}}</li>
+        </ol>
+    </div>
+</body>
+</html>
