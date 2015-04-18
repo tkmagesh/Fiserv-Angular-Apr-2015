@@ -13,8 +13,15 @@
             font-style : italic;
             font-weight: bold;
         }
+    .bugTitle{
+        font-size: 22pt;
+    }
+        .timeStamp {
+            font-style: italic;
+        }
     </style>
     <script src="angular.js"></script>
+    <script src="moment.js"></script>
     <!--
     1. List the bugs
     2. Add a new bug
@@ -30,8 +37,15 @@
         var bugTrackerApp = angular.module('bugTrackerApp',[]);
 
         bugTrackerApp.filter('trimText', function(){
+            return function(data, textLength){
+                return data.length > textLength ? data.substr(0,textLength) + "..." : data;
+            }
+        });
+        bugTrackerApp.value('momentApi', moment);
+
+        bugTrackerApp.filter('toMoment', function(momentApi){
             return function(data){
-                return data.length > 30 ? data.substr(0,30) + "..." : data;
+                return momentApi(data).fromNow();
             }
         });
 
@@ -40,7 +54,7 @@
                 this.id = defaults.id || Date.now();
                 this.title = defaults.title || "";
                 this.isClosed = defaults.isClosed || false;
-                this.createAt = defaults.createdAt || new Date();
+                this.createdAt = defaults.createdAt || new Date();
             }
             Bug.prototype.toggleStatus = function(){
                 this.isClosed = !this.isClosed;
@@ -50,9 +64,9 @@
 
         bugTrackerApp.controller("bugsController", function($scope, Bug){
             $scope.bugs = [
-                new Bug({title : "Ut magna commodo, cupidatat labore eiusmod. Quamquam ad duis nam ut excepteur sempiternum hic minim do an quorum ingeniis se qui", isClosed : false}),
-                new Bug({title : "arbitror sed nescius. Sunt laboris quo laboris, mentitum amet fabulas, ab ut", isClosed : false}),
-                new Bug({title : "ipsum quid quae, de noster vidisse. Illum vidisse est fidelissimae ab ad summ", isClosed : false}),
+                new Bug({title : "Ut magna commodo, cupidatat labore eiusmod. Quamquam ad duis nam ut excepteur sempiternum hic minim do an quorum ingeniis se qui", isClosed : false, createdAt : new Date("18-Apr-2015 9:00:00")}),
+                new Bug({title : "arbitror sed nescius. Sunt laboris quo laboris, mentitum amet fabulas, ab ut", isClosed : false, createdAt : new Date("18-Apr-2015 10:00:00")}),
+                new Bug({title : "ipsum quid quae, de noster vidisse. Illum vidisse est fidelissimae ab ad summ", isClosed : false, createdAt : new Date("18-Apr-2015 11:00:00")}),
             ];
             $scope.addNew = function(){
                 var newBug = {
@@ -81,6 +95,8 @@
         <div>
             <label>Search :</label>
             <input type="text" ng-model='searchBug.title'>
+            <br>
+            <input type="range" name="" id="" min="10" max="100" ng-init='trimTextLength=20' ng-model="trimTextLength">
         </div>
         <hr>
         <label for="">Bug :</label>
@@ -88,11 +104,13 @@
         <input type="button" value="Add Bug" ng-click="addNew()">
         <input type="button" value="Remove Closed">
         <ol>
-            <li
-                ng-repeat = "bug in bugs |filter:searchBug"
-                ng-click="toggleStatus(bug)"
+            <li ng-repeat = "bug in bugs |filter:searchBug">
+            <span ng-click="toggleStatus(bug)"
                 ng-class="{closed : bug.isClosed}"
-            >{{bug.title | trimText}}</li>
+                class="bugTitle">{{bug.title | trimText:trimTextLength}}</span>
+            -
+            <span class="timeStamp">{{bug.createdAt | toMoment}}</span>
+            </li>
         </ol>
     </div>
 </body>
