@@ -63,6 +63,45 @@
 
         var bugTrackerApp = angular.module('bugTrackerApp',['utils']);
 
+         bugTrackerApp.provider('bugStorage', function(){
+             var _storageOption = 'localStorage';
+             return {
+                 setStorage : function(storageOption){
+                     _storageOption = storageOption;
+                 },
+                 $get : function(Bug){
+                     storage = _storageOption === "localStorage" ? window.localStorage : window.sessionStorage;
+                     return {
+                         getAll : function(){
+                            var result = [];
+                            for(var i=0; i < storage.length; i++){
+                                var key = storage.key(i);
+                                var dataAsString = storage.getItem(key);
+                                var bugData = angular.fromJson(dataAsString);
+                                var bug = new Bug(bugData);
+                                result.push(bug);
+                            }
+                            return result;
+                        },
+                        save : function(bug){
+                            storage.setItem(bug.id, angular.toJson(bug));
+                        },
+                        remove : function(bug){
+                            storage.removeItem(bug.id);
+                        }
+                }
+                }
+             }
+
+         });
+        bugTrackerApp.config(function(bugStorageProvider){
+            bugStorageProvider.setStorage('localStorage');
+        });
+
+
+
+
+
 
 
         /*bugTrackerApp.value('Bug', (function(){
@@ -90,25 +129,7 @@
             }
             return Bug;
         });
-        bugTrackerApp.service('bugStorage' function(Bug){
-            this.getAll = function(){
-                var result = [];
-                for(var i=0; i < storage.length; i++){
-                    var key = storage.key(i);
-                    var dataAsString = storage.getItem(key);
-                    var bugData = angular.fromJson(dataAsString);
-                    var bug = new Bug(bugData);
-                    result.push(bug);
-                }
-                return result;
-            };
-            this.save = function(bug){
-                storage.setItem(bug.id, angular.toJson(bug));
-            };
-            this.remove = function(bug){
-                storage.removeItem(bug.id);
-            };
-        })
+
 
         bugTrackerApp.controller("bugsController", function($scope, Bug, bugStorage){
             $scope.bugs = bugStorage.getAll();

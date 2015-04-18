@@ -9,6 +9,8 @@
         angular
             .module('myApp',['ngRoute'])
             .config(function($routeProvider){
+                myFactory.name = 'something new';
+                console.log(myFactory.name + ' in the config');
                 $routeProvider
                     .when('/products',{
                         templateUrl : 'templates/productsTemplate.html',
@@ -23,6 +25,11 @@
                 })
                   .otherwise('/products');
             })
+            .factory("myFactory", function(){
+                return {
+                    name : "myFactory"
+                }
+            })
             .controller('productsController', function($http, $scope){
                 $http.get('products.json').then(function(response){
                     $scope.products = response.data;
@@ -34,6 +41,10 @@
                     console.log(response);
                     $scope.product = response.data;
                 });
+            })
+            .run(function(myFactory){
+                myFactory.name = 'something new';
+                console.log(myFactory.name + ' in the run');
             });
     </script>
 </head>
